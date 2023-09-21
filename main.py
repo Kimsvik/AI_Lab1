@@ -1,8 +1,9 @@
-def new_function():
-    print("smth")
+def sanya_function():
+    "SANYA FUNCTION"
+    print("vernul 100ku")
 
 
-new_function()
+sanya_function()
 
 
 def print_hi():
@@ -14,5 +15,6 @@ print_hi()
 
 def eshe_odna_function():
     print('eshe smth')
+
 
 eshe_odna_function()
