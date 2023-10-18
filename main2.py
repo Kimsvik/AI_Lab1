@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
@@ -5,19 +6,11 @@ from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GridSearchCV
 from sklearn import metrics
+from sklearn.metrics import classification_report
+from sklearn.metrics import confusion_matrix
 
-dataset = pd.read_csv('input/breast_cancer.csv')
-ds = pd.get_dummies(dataset, columns=['diagnosis'], drop_first=True)
-print(ds)
-y = ds['diagnosis_M']
-x = ds.drop('diagnosis_M', axis=1)
-x = x.drop('id', axis=1)
-i = len(x.columns)
-x = x.drop(x.columns[i-1], axis=1)
-# y.replace(('M', 'B'), (1, 0), inplace=True)
-sc = StandardScaler()
-sc.fit(x)
-x_ans = sc.transform(x)
+import matplotlib.pyplot as plt
+
 
 """
 1. id
@@ -32,34 +25,65 @@ x_ans = sc.transform(x)
 10. concave points (вогнутые точки) - среднее число вогнутых точек в контуре
 """
 
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=1234)
-print(x_test)
+raw_data = pd.read_csv('input/breast_cancer.csv')
+dataset = pd.get_dummies(raw_data, columns=['diagnosis'], drop_first=True)
+print(dataset)
 
-best_model = KNeighborsClassifier(
-    n_neighbors=10,
-    weights='distance',
-    algorithm='auto',
-    leaf_size=30,
-    metric='euclidean',
-    metric_params=None,
-    n_jobs=4
-)
-print(best_model)
+y = dataset['diagnosis_M']
+x = dataset.drop('diagnosis_M', axis=1)
+x = x.drop('id', axis=1)
+x = x.drop(x.columns[-1], axis=1)
 
-model_params = best_model.get_params()
-print(model_params)
-tuned_params = {}
-for k, v in model_params.items():
-    tuned_params[k] = [v]
-tuned_params['n_neighbors'] = range(1, 30)
-clf = GridSearchCV(KNeighborsClassifier(), tuned_params, cv=10, n_jobs=-1)
-clf.fit(x_train, y_train)
-best_params = clf.best_params_
+scaler = StandardScaler()
+scaler.fit(x)
+scaled_x = scaler.transform(x)
+
+scaled_data = pd.DataFrame(scaled_x, columns=x.columns)
+
+# x_train, x_test, y_train, y_test = train_test_split(scaled_data, y, test_size=0.2, random_state=1234)
+x_train, x_test, y_train, y_test = train_test_split(scaled_data, y, test_size=0.2)
+
+# print(x_test)
+
+# y.replace(('M', 'B'), (1, 0), inplace=True)
 
 
-best_model = KNeighborsClassifier(**best_params)
-best_model.fit(x_train, y_train)
-predicted = best_model.predict(x_test)
+# for i in range(1, 51, 1):
 
-print('Used params:', best_params)
-print('Evaluation:\n', metrics.classification_report(y_test, predicted))
+
+model = KNeighborsClassifier(n_neighbors=5)
+# print(model)
+model.fit(x_train, y_train)
+
+predictions = model.predict(x_test)
+
+# print(classification_report(y_test, predictions))
+accuracy = accuracy_score(y_test, predictions)
+print(accuracy)
+
+accuracy = []
+number_of_neighbours = 50
+# neighbours = np.arange(1, number_of_neighbours+1, 1)
+
+max_accuracy = 0
+number_of_neighbour = 0
+for i in np.arange(1, number_of_neighbours+1):
+    new_model = KNeighborsClassifier(n_neighbors=i, weights='distance')
+    new_model.fit(x_train, y_train)
+    new_predictions = new_model.predict(x_test)
+    accuracy_i = accuracy_score(y_test, new_predictions)
+    accuracy.append(accuracy_i)
+    if accuracy_i > max_accuracy:
+        max_accuracy = accuracy_i
+        number_of_neighbour = i
+print(f'Max accuracy = {max_accuracy}')
+print(f'Best number of neighbours = {number_of_neighbour}')
+
+
+plt.plot(accuracy)
+plt.grid(True)
+plt.xlabel('Number of neighbours')
+plt.ylabel('Accuracy')
+plt.show()
+
+
