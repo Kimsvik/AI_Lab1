@@ -33,21 +33,32 @@ raw_data = pd.read_csv('input/breast_cancer.csv')
 dataset = pd.get_dummies(raw_data, columns=['diagnosis'], drop_first=True)
 print(dataset)
 
-y = dataset['diagnosis_M']
-x = dataset.drop('diagnosis_M', axis=1)
-x = x.drop('id', axis=1)
-x = x.drop(x.columns[-1], axis=1)
+y_ds = dataset['diagnosis_M']
+x_ds = dataset.drop('diagnosis_M', axis=1)
+x_ds = x_ds.drop('id', axis=1)
+x_ds = x_ds.drop(x_ds.columns[-1], axis=1)
 
-scaler = StandardScaler()
-scaler.fit(x)
-scaled_x = scaler.transform(x)
+# scaler = StandardScaler()
+# scaler.fit(x)
+# scaled_x = scaler.transform(x)
+#
+# scaled_data = pd.DataFrame(scaled_x, columns=x.columns)
 
-scaled_data = pd.DataFrame(scaled_x, columns=x.columns)
+def DevideTT(x, y):
+    x_training, x_testing, y_training, y_testing = train_test_split(x, y, test_size=0.2)
+    return x_training, x_testing, y_training, y_testing
 
+def Scaler(x):
+    # the scaler object (model)
+    scaler = StandardScaler()
+    # fit and transform the data
+    x_scaled = scaler.fit_transform(x)
+    return x_scaled
 
-def KNC(x, y):
-    # x_train, x_test, y_train, y_test = train_test_split(scaled_data, y, test_size=0.2, random_state=1234)
-    x_train, x_test, y_train, y_test = train_test_split(scaled_data, y, test_size=0.2)
+def KNC(x, y, scale=False):
+    if scale:
+        x = Scaler(x)
+    x_train, x_test, y_train, y_test = DevideTT(x, y)
     model = KNeighborsClassifier(n_neighbors=5)
     # print(model)
     model.fit(x_train, y_train)
@@ -81,8 +92,9 @@ def KNC(x, y):
     plt.ylabel('Accuracy')
     plt.show()
 
-
-def CV(x, y):
+def CV(x, y, scale=False):
+    if scale:
+        x = Scaler(x)
     x = np.array(x)
     y = np.array(y)
 
@@ -102,11 +114,26 @@ def CV(x, y):
     array = cross_val_score(model, x, y, cv=kf, scoring='accuracy')
     print(array)
 
+def LR(x, y, scale=False):
+    if scale:
+        x = Scaler(x)
+    x_train, x_test, y_train, y_test = DevideTT(x, y)
 
-def LR(x, y):
-    clf = LogisticRegression(random_state=0).fit(x, y)
-    clf.predict(x[:2, :])
-    clf.predict_proba(x[:2, :])
-    clf.score(x, y)
+    C = np.arange(0.01, 1, 0.01)
 
-LR(x, y)
+    accuracy = []
+    for Ci in C:
+        log_reg = LogisticRegression(C=Ci)
+        log_reg.fit(x_train, y_train)
+        y_pred = log_reg.predict(x_test)
+        accuracy.append(accuracy_score(y_test, y_pred))
+
+    plt.plot(C, accuracy)
+    plt.grid(True)
+    plt.xlabel('C')
+    plt.ylabel('Accuracy')
+    plt.show()
+
+# KNC(x_ds, y_ds, scale=True)
+# CV(x_ds, y_ds, scale=True)
+LR(x_ds, y_ds, scale=True)
