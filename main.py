@@ -4,12 +4,17 @@ from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
 from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import GridSearchCV
+from sklearn import metrics
+from sklearn.metrics import classification_report
+from sklearn.metrics import confusion_matrix
 
 import matplotlib.pyplot as plt
 
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
 from sklearn.linear_model import LogisticRegression
+
 
 """
 1. id
@@ -33,7 +38,6 @@ x_ds = dataset.drop('diagnosis_M', axis=1)
 x_ds = x_ds.drop('id', axis=1)
 x_ds = x_ds.drop(x_ds.columns[-1], axis=1)
 
-
 # scaler = StandardScaler()
 # scaler.fit(x)
 # scaled_x = scaler.transform(x)
@@ -44,7 +48,6 @@ def DevideTT(x, y):
     x_training, x_testing, y_training, y_testing = train_test_split(x, y, test_size=0.2)
     return x_training, x_testing, y_training, y_testing
 
-
 def Scaler(x):
     # the scaler object (model)
     scaler = StandardScaler()
@@ -52,8 +55,7 @@ def Scaler(x):
     x_scaled = scaler.fit_transform(x)
     return x_scaled
 
-
-def KNN(x, y, scale=False):
+def KNC(x, y, scale=False):
     if scale:
         x = Scaler(x)
     x_train, x_test, y_train, y_test = DevideTT(x, y)
@@ -71,7 +73,7 @@ def KNN(x, y, scale=False):
 
     max_accuracy = 0
     number_of_neighbour = 0
-    for i in np.arange(1, number_of_neighbours + 1):
+    for i in np.arange(1, number_of_neighbours+1):
         new_model = KNeighborsClassifier(n_neighbors=i, weights='distance')
         new_model.fit(x_train, y_train)
         new_predictions = new_model.predict(x_test)
@@ -83,12 +85,12 @@ def KNN(x, y, scale=False):
     print(f'Max accuracy = {max_accuracy}')
     print(f'Best number of neighbours = {number_of_neighbour}')
 
+
     plt.plot(accuracy)
     plt.grid(True)
     plt.xlabel('Number of neighbours')
     plt.ylabel('Accuracy')
     plt.show()
-
 
 def CV(x, y, scale=False):
     if scale:
@@ -112,7 +114,6 @@ def CV(x, y, scale=False):
     array = cross_val_score(model, x, y, cv=kf, scoring='accuracy')
     print(array)
 
-
 def LR(x, y, scale=False):
     if scale:
         x = Scaler(x)
@@ -133,7 +134,6 @@ def LR(x, y, scale=False):
     plt.ylabel('Accuracy')
     plt.show()
 
-
-KNN(x_ds, y_ds, scale=True)
-# CV(x_ds, y_ds, scale=False)
-# LR(x_ds, y_ds, scale=True)
+# KNC(x_ds, y_ds, scale=True)
+# CV(x_ds, y_ds, scale=True)
+LR(x_ds, y_ds, scale=True)

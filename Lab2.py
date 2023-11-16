@@ -88,16 +88,24 @@ def p5_2_MultinominalNB(x_train, x_test, y_train, y_test):
     # print(models)
 
     best_index = models['test precision'].idxmax()
-    print(f'best index = {best_index}')
+    print(f'\nbest index = {best_index}')
     print(f'best alpha = {alpha_range[best_index]}')
-    print(f'best accuracy = {test_score[best_index]}')
+    print(f'best accuracy = {"%.3f" % test_score[best_index]}')
 
     model = MultinomialNB(alpha=alpha_range[best_index])
     model.fit(x_train, y_train)
 
     plt.plot(alpha_range, test_score)
+    plt.grid(True)
+    plt.ylabel('Accuracy')
+    plt.xlabel('alpha')
     plt.show()
 
+    # plt.plot(alpha_range, test_precision)
+    # plt.grid(True)
+    # plt.ylabel('Precision')
+    # plt.xlabel('alpha')
+    # plt.show()
 
     return model
 
@@ -128,7 +136,7 @@ def p7_roc(model, x_test, y_test):
     plt.ylim([0, 1])
     plt.ylabel('True Positive Rate')
     plt.xlabel('False Positive Rate')
-    plt.grid('on')
+    plt.grid(True)
     plt.show()
 
 
