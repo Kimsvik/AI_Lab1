@@ -22,10 +22,13 @@ def p2_sum(data_n):
     data_n.isnull().sum()
     data_n['workclass'].hist()
     f, ax = plt.subplots(figsize=(10, 8))
-    ax = sns.countplot(x="income", hue="sex", data=data, palette="Set1")
+    ax = sns.countplot(x="income", hue="sex", data=data_n, palette="Set1")
     ax.set_title("Frequency distribution of income variable wrt sex")
-    plt.show
+    plt.show()
 
 
-data = p1_read('input/income.csv')
-p2_sum(data)
+#data = p1_read('input/income.csv')
+#p2_sum(data)
+
+
+raw_data = pd.read_csv('input/breast_cancer.csv')
