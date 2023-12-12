@@ -10,6 +10,13 @@
             </Attribute>
           </value>
         </entry>
+        <entry key="\input\income.csv">
+          <value>
+            <Attribute>
+              <option name="separator" value="," />
+            </Attribute>
+          </value>
+        </entry>
         <entry key="\input\spam.csv">
           <value>
             <Attribute>
