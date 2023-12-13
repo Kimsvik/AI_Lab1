@@ -327,7 +327,6 @@ def p6_Boosting(x_train, x_test, y_train, y_test):
 "ПУНКТ 7"
 def p7_Precept(x_train, x_test, y_train, y_test):
 
-    def
     x_train = x_train.to_numpy(dtype=('float32'))
     x_test = x_test.to_numpy(dtype=('float32'))
     y_train = np_utils.to_categorical(y_train, 2)
@@ -336,7 +335,7 @@ def p7_Precept(x_train, x_test, y_train, y_test):
     NB_CLASSES = y_train.shape[1]
     INPUT_SHAPE = (x_train.shape[1],)
     model = Sequential()
-    model.add((32, input_shape=INPUT_SHAPE))
+    model.add(Dense(32, input_shape=INPUT_SHAPE))
     model.add(Activation('relu'))
     model.add(Dropout(0.3))
     model.add((16))
@@ -406,7 +405,3 @@ p2_12_heat_map(data)
 # p4_Tree(x_train, x_test, y_train, y_test)
 #p5_Forest(x_train, x_test, y_train, y_test)
 #p6_Boosting(x_train, x_test, y_train, y_test)
-
-
-
-
