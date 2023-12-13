@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from collections import Counter
 import numpy as np
+import sklearn.tree
 from sklearn import feature_extraction
 from sklearn import model_selection
 from sklearn.naive_bayes import MultinomialNB
@@ -10,6 +11,9 @@ from sklearn.metrics import confusion_matrix
 from sklearn.svm import SVC
 import seaborn as sns
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from catboost import CatBoostClassifier
+from sklearn.metrics import f1_score
 
 
 "ПУНКТ 1"
@@ -57,17 +61,84 @@ def p2_sum(data_n):
 
 
 "ПУНКТ 3"
-def p3_split(data_file):
-    data_file['income'] = data_file['income'].map({'>50K': 1, '<=50K': 0})
-    x_train, x_test, y_train, y_test = model_selection.train_test_split(X, data_file['income'], test_size=0.33)
+def p3_token(data_file):
+    tokenizer = feature_extraction.text.CountVectorizer()
+    X_token = tokenizer.fit_transform(data_file[:'native_country'])
+    return X_token
+
+def p3_split(df):
+    #df['income'] = df['income'].map({'>50K': 1, '<=50K': 0})
+
+    def zip_clmn(clmn):
+        list_of_uniq = list(set(clmn))
+
+        N = len(list_of_uniq)
+        spam = list(range(0, N))
+
+        dict_clmn = dict(zip(list_of_uniq, spam))
+        print(dict_clmn)
+        return dict_clmn
+
+    df['workclass'] = df['workclass'].map(zip_clmn(df['workclass']))
+    df['education'] = df['education'].map(zip_clmn(df['education']))
+    df['marital_status'] = df['marital_status'].map(zip_clmn(df['marital_status']))
+    df['occupation'] = df['occupation'].map(zip_clmn(df['occupation']))
+    df['relationship'] = df['relationship'].map(zip_clmn(df['relationship']))
+    df['race'] = df['race'].map(zip_clmn(df['race']))
+    df['sex'] = df['sex'].map(zip_clmn(df['sex']))
+    df['native_country'] = df['native_country'].map(zip_clmn(df['native_country']))
+    df['income'] = df['income'].map(zip_clmn(df['income']))
+
+    print(new_df['workclass'])
+    print(new_ydf)
+    x_train, x_test, y_train, y_test = model_selection.train_test_split(new_df, new_ydf, test_size=0.33)
     return x_train, x_test, y_train, y_test
 
-"ПУНКТ 4"
 
+"ПУНКТ 4"
+def p4_Tree(x_train, x_test, y_train, y_test):
+    depth_range = np.arange(1, 100, 1)
+    train_score = []
+    test_score = []
+    optimal_depth = 0
+    useless_var = 0
+
+    for i in range(len(depth_range)):
+        model = DecisionTreeClassifier(max_depth=depth_range[i])
+        model.fit(x_train, y_train)
+        train_score.append(f1_score(y_train, model.predict(x_train)))
+        test_score.append(f1_score(y_test, model.predict(x_test)))
+        if (test_score[i] > useless_var):
+            useless_var = test_score[i]
+            optimal_depth = depth_range[i]
+
+    model = DecisionTreeClassifier(max_depth=optimal_depth)
+    model.fit(x_train, y_train)
+
+    print(optimal_depth)
+
+    f = plt.figure()
+    f.set_size_inches(16, 5)
+    s1 = f.add_subplot(1, 1, 1)
+    s1.grid(True)
+    f.clf()
+
+    plt.title("Зависимость F-меры от глубины")
+    plt.plot(depth_range, train_score, depth_range, test_score)
+    plt.ylabel("F-мера")
+    plt.xlabel("Глубина")
+    plt.grid(True)
+
+    plt.show()
 
 
 data = p1_read('C:/Users/Сергей/PycharmProjects/AI_Lab1/input/income.csv')
-p2_sum(data)
+#p2_sum(data)
+#X = p3_token(data)
+x_train, x_test, y_train, y_test = p3_split(data)
+print(y_test)
+p4_Tree(x_train, x_test, y_train, y_test)
+
 
 
 
