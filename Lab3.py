@@ -133,6 +133,42 @@ def p4_Tree(x_train, x_test, y_train, y_test):
     plt.show()
 
 
+"ПУНКТ 5"
+def p5_Forest(x_train, x_test, y_train, y_test):
+    estimators_range = np.arange(10, 30, 1)
+    train_score = []
+    test_score = []
+    optimal_estimator = 0
+    useless_var = 0
+
+    for i in range(len(estimators_range)):
+        model = RandomForestClassifier(n_estimators=estimators_range[i])
+        model.fit(x_train, y_train)
+        train_score.append(f1_score(y_train, model.predict(x_train)))
+        test_score.append(f1_score(y_test, model.predict(x_test)))
+        if (test_score[i] > useless_var):
+            useless_var = test_score[i]
+            optimal_estimator = estimators_range[i]
+
+    model = RandomForestClassifier(n_estimators=optimal_estimator)
+    model.fit(x_train, y_train)
+
+    print(optimal_estimator)
+
+    f = plt.figure()
+    f.set_size_inches(16, 5)
+    s1 = f.add_subplot(1, 1, 1)
+    s1.grid(True)
+    f.clf()
+
+    plt.title("Зависимость F-меры от глубины")
+    plt.plot(estimators_range, train_score, estimators_range, test_score)
+    plt.ylabel("F-мера")
+    plt.xlabel("Количество деревьев")
+    plt.grid(True)
+
+    plt.show()
+
 data = p1_read('C:/Users/Сергей/PycharmProjects/AI_Lab1/input/income.csv')
 #p2_sum(data)
 #X = p3_token(data)
