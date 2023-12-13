@@ -14,9 +14,11 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from catboost import CatBoostClassifier
 from sklearn.metrics import f1_score
+
 from tensorflow.python.keras.utils import np_utils
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Activation, Dropout
+from dython import nominal
 
 
 "ПУНКТ 1"
@@ -26,41 +28,156 @@ def p1_read(path):
 
 
 "ПУНКТ 2"
-def p2_sum(data_n):
-    data_n.isnull().sum()
-    data_n['workclass'].hist()
-    f, ax = plt.subplots(figsize=(10, 8))
-    ax = sns.countplot(x="income", hue="sex", data=data_n, palette="Set1")
-    ax.set_title("Frequency distribution of income variable wrt sex")
+def p2_1_null_counter(df):
+
+    for col in df.columns:
+        print(col)
+    print('\n')
+
+    columns = list(df)
+    for i in columns:
+        print(df[df[i] == ' ?'][i].count())
+    print('\n')
+
+
+
+
+
+
+
+
+
+    # df.replace('?', np.NaN, inplace=True)
+    #
+    # categorical = [var for var in df.columns if data[var].dtype == 'O']
+    # df[categorical].head()
+
+def p2_2_workclass(df):
+    fig, ax = plt.subplots(figsize=(10, 7))
+    ax = df['workclass'].hist(edgecolor='black', color='lightsteelblue')
+    plt.grid(False)
+    plt.xticks(rotation=15)
+    plt.ylabel("count")
+
+    for label in ax.containers:
+        ax.bar_label(label)
+
     plt.show()
 
-    f, ax = plt.subplots(figsize=(10, 8))
-    x = data_n['age']
-    ax = sns.distplot(x, bins=10, color='blue')
-    ax.set_title("Distribution of age variable")
+def p2_3_workclass_hist(df):
+    ax = plt.subplots(figsize=(7, 5))
+    ax = sns.countplot(x="income", hue="sex", data=df, palette="Set1")
+    ax.set_title("Frequency distribution of income variable sex")
+
+    for label in ax.containers:
+        ax.bar_label(label)
+
     plt.show()
 
-    f, ax = plt.subplots(figsize=(10, 8))
-    x = data_n['age']
+def p2_4_race(df):
+    ax = plt.subplots(figsize=(7, 5))
+    ax = sns.countplot(x="income", hue="race", data=df, palette="Set1")
+    ax.set_title("Frequency distribution of income variable race")
+
+    for label in ax.containers:
+        ax.bar_label(label)
+
+    plt.show()
+
+def p2_5_income_by_workclass(df):
+    ax = plt.subplots(figsize=(10, 7))
+    ax = sns.countplot(x="workclass", hue="income", data=df, palette="Set1")
+    ax.set_title("Frequency distribution of income variable race")
+
+    for label in ax.containers:
+        ax.bar_label(label)
+
+    plt.show()
+
+def p2_6_workclass_by_sex(df):
+    ax = plt.subplots(figsize=(10, 7))
+    ax = sns.countplot(x="workclass", hue="sex", data=df, palette="Set1")
+    ax.set_title("Frequency distribution of workclass variable sex")
+
+    for label in ax.containers:
+        ax.bar_label(label)
+
+    plt.show()
+
+def p2_7_age(df):
+    fig, ax = plt.subplots(figsize=(10, 7))
+    ax = df['age'].hist(edgecolor='black', color='lightsteelblue')
+    plt.grid(False)
+    plt.xticks(rotation=0)
+    plt.ylabel("count")
+    plt.xlabel("age")
+
+    for label in ax.containers:
+        ax.bar_label(label)
+
+    plt.show()
+
+def p2_8_age_box_plot(df):
+    f, ax = plt.subplots(figsize=(5, 7))
+    x = df['age']
     ax = sns.boxplot(x)
     ax.set_title("Visualize outliers in age variable")
     plt.show()
 
+def p2_9_income_age(df):
     f, ax = plt.subplots(figsize=(10, 8))
-    ax = sns.boxplot(x="income", y="age", data=data_n)
+    ax = sns.boxplot(x="income", y="age", data=df)
     ax.set_title("Visualize income wrt age variable")
     plt.show()
 
+def p2_10(df):
     f, ax = plt.subplots(figsize=(10, 8))
-    ax = sns.boxplot(x="income", y="age", hue="sex", data=data_n)
+    ax = sns.boxplot(x="income", y="age", hue="sex", data=df)
     ax.set_title("Visualize income wrt age and sex variable")
     ax.legend(loc='upper right')
     plt.show()
 
-    data_n.replace('?', np.NaN, inplace=True)
+def p2_11(df):
+    f, ax = plt.subplots(figsize=(10, 8))
+    ax = sns.boxplot(x="race", y="age", data=df)
+    ax.set_title("Visualize income wrt age and sex variable")
+    ax.legend(loc='upper right')
+    plt.show()
 
-    categorical = [var for var in data_n.columns if data[var].dtype=='O']
-    data_n[categorical].head()
+def p2_12_heat_map(df):
+    numeric_data = df.select_dtypes(include=[np.number]).columns
+    categorical_data = df.select_dtypes(exclude=[np.number]).columns
+
+    # print(numeric_data)
+    # print(categorical_data)
+    # new_df = df[numeric_data].copy()
+
+    nominal.associations(df, nominal_columns='all', annot=False, cmap='coolwarm')
+    # nominal.associations(df[numeric_data])
+    # sns.heatmap(df.corr(), cmap='coolwarm')
+    # plt.show()
+
+    # new_df.corr().style.format("{:.4}").background_gradient(cmap=plt.get_cmap('coolwarm'), axis=1)
+    # sns.heatmap(new_df.corr())
+    # plt.show()
+
+def p2_13(df):
+    df.replace(' ?', np.NaN, inplace=True)
+
+def p2_14(df):
+    numeric_data = df.select_dtypes(include=[np.number]).columns
+    categorical_data = df.select_dtypes(exclude=[np.number]).columns
+
+    print('\nnumeric data:\n')
+    for name in numeric_data:
+        print(name)
+
+    print('\ncategorical data:\n')
+    for name in categorical_data:
+        print(name)
+
+    # print(numeric_data)
+    # print(categorical_data)
 
 
 "ПУНКТ 3"
@@ -262,13 +379,34 @@ def p7_Precept(x_train, x_test, y_train, y_test):
     plt.show()
 
 
-data = p1_read('C:/Users/Сергей/PycharmProjects/AI_Lab1/input/income.csv')
-#p2_sum(data)
+
+
+
+data = p1_read('input/income.csv')
+#data = p1_read('C:/Users/Сергей/PycharmProjects/AI_Lab1/input/income.csv')
+
+# p2_1_null_counter(data)
+# p2_2_workclass(data)
+# p2_3_workclass_hist(data)
+# p2_4_race(data)
+# p2_5_income_by_workclass(data)
+# p2_6_workclass_by_sex(data)
+# p2_7_age(data)
+# p2_8_age_box_plot(data)
+# p2_9_income_age(data)
+# p2_10(data)
+# p2_11(data)
+p2_12_heat_map(data)
+# p2_13(data)
+# p2_14(data)
+
 #X = p3_token(data)
-x_train, x_test, y_train, y_test = p3_split(data)
-#p4_Tree(x_train, x_test, y_train, y_test)
+# x_train, x_test, y_train, y_test = p3_split(data)
+# print(y_test)
+# p4_Tree(x_train, x_test, y_train, y_test)
 #p5_Forest(x_train, x_test, y_train, y_test)
 #p6_Boosting(x_train, x_test, y_train, y_test)
+
 
 
 
