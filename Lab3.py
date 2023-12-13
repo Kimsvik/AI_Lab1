@@ -89,8 +89,9 @@ def p3_split(df):
     df['native_country'] = df['native_country'].map(zip_clmn(df['native_country']))
     df['income'] = df['income'].map(zip_clmn(df['income']))
 
-    print(new_df['workclass'])
-    print(new_ydf)
+    new_ydf = df['income']
+    new_df = df.drop('income', axis=1)
+
     x_train, x_test, y_train, y_test = model_selection.train_test_split(new_df, new_ydf, test_size=0.33)
     return x_train, x_test, y_train, y_test
 
