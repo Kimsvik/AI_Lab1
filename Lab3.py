@@ -181,11 +181,6 @@ def p2_14(df):
 
 
 "ПУНКТ 3"
-def p3_token(data_file):
-    tokenizer = feature_extraction.text.CountVectorizer()
-    X_token = tokenizer.fit_transform(data_file[:'native_country'])
-    return X_token
-
 def p3_split(df):
     #df['income'] = df['income'].map({'>50K': 1, '<=50K': 0})
 
@@ -399,7 +394,6 @@ data = p1_read('input/income.csv')
 # p2_13(data)
 # p2_14(data)
 
-#X = p3_token(data)
 x_train, x_test, y_train, y_test = p3_split(data)
 # print(y_test)
 # p4_Tree(x_train, x_test, y_train, y_test)
