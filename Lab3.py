@@ -418,7 +418,7 @@ def p8_mnist():
     plt.show()
 
 #data = p1_read('input/income.csv')
-data = p1_read('C:/Users/Сергей/Desktop/МЭИ/М3/ИИ/lab/income.csv')
+data = p1_read('C:/Users/Сергей/Desktop/МЭИ/М3/ИИ/lab/input/income.csv')
 
 # p2_1_null_counter(data)
 # p2_2_workclass(data)
