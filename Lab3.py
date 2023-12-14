@@ -18,8 +18,10 @@ from sklearn.metrics import f1_score
 from tensorflow.python.keras.utils import np_utils
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Activation, Dropout
+from tensorflow.keras.datasets import mnist
 from dython import nominal
 
+from sklearn.metrics import f1_score
 
 "ПУНКТ 1"
 def p1_read(path):
@@ -328,7 +330,6 @@ def p6_Boosting(x_train, x_test, y_train, y_test):
     print(optimal_estimator)
 
     f = plt.figure()
-    f.set_size_inches(16, 5)
     s1 = f.add_subplot(1, 1, 1)
     s1.grid(True)
     f.clf()
@@ -344,7 +345,6 @@ def p6_Boosting(x_train, x_test, y_train, y_test):
 
 "ПУНКТ 7"
 def p7_Precept(x_train, x_test, y_train, y_test):
-
     x_train = x_train.to_numpy(dtype=('float32'))
     x_test = x_test.to_numpy(dtype=('float32'))
     y_train = np_utils.to_categorical(y_train, 2)
@@ -356,16 +356,16 @@ def p7_Precept(x_train, x_test, y_train, y_test):
     model.add(Dense(32, input_shape=INPUT_SHAPE))
     model.add(Activation('relu'))
     model.add(Dropout(0.3))
-    model.add((16))
+    model.add(Dense(16))
     model.add(Activation('relu'))
-    model.add((8))
+    model.add(Dense(8))
     model.add(Activation('relu'))
-    model.add((NB_CLASSES))
+    model.add(Dense(NB_CLASSES))
     model.add(Activation('softmax'))
     model.summary()
 
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['Precision', 'Recall'])
-    EPOCHS = 50
+    EPOCHS = 30
     history = model.fit(x_train, y_train, batch_size=32, epochs=EPOCHS, verbose=1,
                         validation_data=(x_test, y_test))
     f1_score_list_train = []
@@ -385,7 +385,7 @@ def p7_Precept(x_train, x_test, y_train, y_test):
     s1.grid(True)
     f.clf()
 
-    epochs_range = np.arange(1, 51, 1)
+    epochs_range = np.arange(1, 31, 1)
 
     plt.title("Зависимость F-меры от эпохи (epochs range)")
     plt.plot(epochs_range, f1_score_list_train, epochs_range, f1_score_list_test)
@@ -396,11 +396,52 @@ def p7_Precept(x_train, x_test, y_train, y_test):
     plt.show()
 
 
+"ПУНКТ 8"
+def p8_mnist():
+    (x_train, y_train), (x_test, y_test) = mnist.load_data()
+    # pick a sample to plot
+    sample = 1
+    image = x_train[sample]
+    # plot the sample
+    fig = plt.figure
+    plt.imshow(image, cmap='gray')
+    plt.show()
 
+    x_train = x_train.reshape(x_train.shape[0], 28 * 28)
+    x_test = x_test.reshape(x_test.shape[0], 28 * 28)
 
+    boost_estimators_range = np.arange(10, 40, 10)
+    boost_train_score = []
+    boost_test_score = []
+    boost_optimal_estimator = 0
+    boost_useless_var = 0
 
-data = p1_read('input/income.csv')
-#data = p1_read('C:/Users/Сергей/PycharmProjects/AI_Lab1/input/income.csv')
+    for i in range(len(boost_estimators_range)):
+        model = CatBoostClassifier(n_estimators=boost_estimators_range[i], task_type="GPU", devices='0:1')
+        model.fit(x_train, y_train)
+        boost_train_score.append(f1_score(y_train, model.predict(x_train), average='micro'))
+        boost_test_score.append(f1_score(y_test, model.predict(x_test), average='micro'))
+        if (boost_test_score[i] > boost_useless_var):
+            boost_useless_var = boost_test_score[i]
+            boost_optimal_estimator = boost_estimators_range[i]
+
+    print("Оптимальное количество - ", boost_optimal_estimator)
+
+    f = plt.figure()
+    s1 = f.add_subplot(1, 1, 1)
+    s1.grid(True)
+    f.clf()
+
+    plt.title("Зависимость F-меры от глубины (boost estimators range)")
+    plt.plot(boost_estimators_range, boost_train_score, boost_estimators_range, boost_test_score)
+    plt.ylabel("F-мера")
+    plt.xlabel("Количество деревьев")
+    plt.grid(True)
+
+    plt.show()
+
+#data = p1_read('input/income.csv')
+data = p1_read('C:/Users/Сергей/Desktop/МЭИ/М3/ИИ/lab/input/income.csv')
 
 # p2_1_null_counter(data)
 # p2_2_workclass(data)
@@ -423,3 +464,5 @@ x_train, x_test, y_train, y_test = p3_split(data)
 # p4_Tree(x_train, x_test, y_train, y_test)
 p5_Forest(x_train, x_test, y_train, y_test)
 #p6_Boosting(x_train, x_test, y_train, y_test)
+#p7_Precept(x_train, x_test, y_train, y_test)
+p8_mnist()
