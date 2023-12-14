@@ -183,6 +183,11 @@ def p2_14(df):
 
 
 "ПУНКТ 3"
+def p3_token(data_file):
+    tokenizer = feature_extraction.text.CountVectorizer()
+    X_token = tokenizer.fit_transform(data_file[:'native_country'])
+    return X_token
+
 def p3_split(df):
     #df['income'] = df['income'].map({'>50K': 1, '<=50K': 0})
 
@@ -214,7 +219,7 @@ def p3_split(df):
 
 "ПУНКТ 4"
 def p4_Tree(x_train, x_test, y_train, y_test):
-    depth_range = np.arange(1, 100, 1)
+    depth_range = np.arange(1, 20, 1)
     train_score = []
     test_score = []
     optimal_depth = 0
@@ -241,16 +246,25 @@ def p4_Tree(x_train, x_test, y_train, y_test):
 
     plt.title("Зависимость F-меры от глубины (depth_range)")
     plt.plot(depth_range, train_score, depth_range, test_score)
+    plt.legend(['Тренировочная выборка', 'Тестовая выборка'])
     plt.ylabel("F-мера")
     plt.xlabel("Глубина")
     plt.grid(True)
+
+    """матрица ошибок решающего дерева"""
+    confusion_matr = confusion_matrix(y_test, model.predict(x_test))
+    conf_frame = pd.DataFrame(data=confusion_matr, columns=['predicted <=50k', 'predicted >50k'],
+                              index=['actual <=50k', 'actual >50k'])
+    print('\nconfusion frame\n')
+    print(conf_frame)
 
     plt.show()
 
 
 "ПУНКТ 5"
 def p5_Forest(x_train, x_test, y_train, y_test):
-    estimators_range = np.arange(10, 30, 1)
+    max_tree = 20
+    estimators_range = np.arange(1, max_tree, 1)
     train_score = []
     test_score = []
     optimal_estimator = 0
@@ -279,7 +293,16 @@ def p5_Forest(x_train, x_test, y_train, y_test):
     plt.plot(estimators_range, train_score, estimators_range, test_score)
     plt.ylabel("F-мера")
     plt.xlabel("Количество деревьев")
+    plt.legend(['Тренировочная выборка', 'Тестовая выборка'])
     plt.grid(True)
+    plt.xlim(1, max_tree-1)
+
+    """матрица ошибок случайный лес"""
+    confusion_matr = confusion_matrix(y_test, model.predict(x_test))
+    conf_frame = pd.DataFrame(data=confusion_matr, columns=['predicted <=50k', 'predicted >50k'],
+                              index=['actual <=50k', 'actual >50k'])
+    print('\nconfusion frame\n')
+    print(conf_frame)
 
     plt.show()
 
@@ -431,14 +454,15 @@ data = p1_read('C:/Users/Сергей/Desktop/МЭИ/М3/ИИ/lab/input/income.c
 # p2_9_income_age(data)
 # p2_10(data)
 # p2_11(data)
-#p2_12_heat_map(data)
+# p2_12_heat_map(data)
 # p2_13(data)
 # p2_14(data)
 
+#X = p3_token(data)
 x_train, x_test, y_train, y_test = p3_split(data)
 # print(y_test)
 # p4_Tree(x_train, x_test, y_train, y_test)
-#p5_Forest(x_train, x_test, y_train, y_test)
+p5_Forest(x_train, x_test, y_train, y_test)
 #p6_Boosting(x_train, x_test, y_train, y_test)
 #p7_Precept(x_train, x_test, y_train, y_test)
 p8_mnist()
