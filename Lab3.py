@@ -218,6 +218,7 @@ def p3_split(df):
 
 
 "ПУНКТ 4"
+"ПУНКТ 4"
 def p4_Tree(x_train, x_test, y_train, y_test):
     depth_range = np.arange(1, 20, 1)
     train_score = []
